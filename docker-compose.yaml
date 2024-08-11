@@ -1,0 +1,29 @@
+volumes:
+  loanfy_data: {}
+  loanfy_data_backups: {}
+
+services:
+  postgres:
+    image: postgres:13
+    container_name: postgres
+    volumes:
+      - loanfy_data:/var/lib/postgresql/data
+      - loanfy_data_backups:/backups
+    env_file:
+      - ./.envs/.local/.postgres
+    ports:
+      - "5432:5432"
+
+  loanfy:
+    build: loanfy
+    command: bash -c "pip install -r requirements.txt && python manage.py runserver 0.0.0.0:80"
+    restart: always
+    volumes:
+      - ./loanfy/.:/app:rw
+    env_file:
+      - ./.envs/.local/.django
+      - ./.envs/.local/.postgres
+    ports:
+      - "8000:80"
+    depends_on:
+      - postgres
