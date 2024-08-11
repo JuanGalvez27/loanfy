@@ -1,8 +1,5 @@
+from apps.authentication.views import CustomTokenObtainPairView, CustomTokenRefreshView
 from django.urls import path
-from apps.auth.views import (
-    CustomTokenObtainPairView,
-    CustomTokenRefreshView
-)
 
 urlpatterns = [
     path("token/", CustomTokenObtainPairView.as_view(), name="token_obtain_pair"),
