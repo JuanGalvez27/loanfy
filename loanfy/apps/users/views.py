@@ -13,9 +13,9 @@ class UserAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
-        tags=["Usuario"],
+        tags=["User"],
         methods=["GET"],
-        summary="Crear usuario Administrador",
+        summary="List users",
         request=UserSerializer,
         responses={
             201: OpenApiResponse(
