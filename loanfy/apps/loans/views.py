@@ -1,5 +1,5 @@
-from apps.customers.models import Customer
-from apps.customers.serializers import CustomerSerializer, CustomerWriteSerializer
+from apps.loans.models import Loan
+from apps.loans.serializers import LoanSerializer
 from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -7,17 +7,17 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 
-class CustomerCreateAPIView(APIView):
+class LoanCreateAPIView(APIView):
     # permission_classes = [IsAuthenticated]
 
     @extend_schema(
-        tags=["Customer"],
+        tags=["Loan"],
         methods=["POST"],
-        summary="Create a Customer",
-        request=CustomerWriteSerializer,
+        summary="Create a Loan",
+        request=LoanSerializer,
         responses={
             201: OpenApiResponse(
-                response=CustomerSerializer,
+                response=LoanSerializer,
                 description="Created",
             ),
             # 400: HTTP_response_400,
@@ -26,7 +26,7 @@ class CustomerCreateAPIView(APIView):
         },
     )
     def post(self, request, *args, **kwargs):
-        """Create Customer
+        """Create Loan
 
         Args:
 
@@ -46,24 +46,31 @@ class CustomerCreateAPIView(APIView):
 
         """
         data = request.data
-        serializer = CustomerWriteSerializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        customer_serializer = CustomerSerializer(data=serializer.data)
-        if customer_serializer.is_valid():
-            customer_serializer.save()
-            return Response(customer_serializer.data, status=status.HTTP_201_CREATED)
-        return Response(customer_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer = LoanSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class CustomerDetailAPIView(APIView):
+class LoanDetailAPIView(APIView):
     # permission_classes = [IsAuthenticated]
+
+    def get_object(self, external_id):
+        try:
+            return Loan.objects.get(external_id=external_id)
+        except Loan.DoesNotExist:
+            return Response(
+                {"message": "No loan found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
     @extend_schema(
-        tags=["Customer"],
+        tags=["Loan"],
         methods=["GET"],
-        summary="Get Customer info",
+        summary="Get Loan detail",
         responses={
             200: OpenApiResponse(
-                response=CustomerSerializer,
+                response=LoanSerializer,
                 description="OK",
             ),
             # 400: HTTP_response_400,
@@ -71,23 +78,73 @@ class CustomerDetailAPIView(APIView):
             # 500: HTTP_response_500,
         },
     )
-    def get(self, request, external_id):
-        """
-        Customer Detail
+    def get(self, request, external_id, *args, **kwargs):
+        """Detail Loan
 
         Args:
 
-            external_id: Customer external id
+            external_id: Loan external id
 
         Returns:
 
-            JSON with de data of the customer.
+            JSON with de data of the loan.
+
         """
-        try:
-            customer = Customer.objects.get(external_id=external_id)
-        except Customer.DoesNotExist:
-            return Response(
-                {"message": "No customer found"}, status=status.HTTP_404_NOT_FOUND
-            )
-        customer_serializer = CustomerSerializer(customer)
-        return Response(customer_serializer.data, status=status.HTTP_200_OK)
+        loan = self.get_object(external_id)
+        loan_serializer = LoanSerializer(loan)
+        return Response(loan_serializer.data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        tags=["Loan"],
+        methods=["PATCH"],
+        summary="Update Loan data",
+        request=LoanSerializer,
+        responses={
+            200: OpenApiResponse(
+                response=LoanSerializer,
+                description="OK",
+            ),
+            # 400: HTTP_response_400,
+            # 401: HTTP_response_401,
+            # 500: HTTP_response_500,
+        },
+    )
+    def patch(self, request, external_id):
+        data = request.data
+        loan = self.get_object(external_id)
+        serializer = LoanSerializer(loan, data=data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class LoanListlAPIView(APIView):
+    # permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        tags=["Loan"],
+        methods=["GET"],
+        summary="Get Loan list",
+        request=LoanSerializer,
+        responses={
+            200: OpenApiResponse(
+                response=LoanSerializer,
+                description="OK",
+            ),
+            # 400: HTTP_response_400,
+            # 401: HTTP_response_401,
+            # 500: HTTP_response_500,
+        },
+    )
+    def get(self, request, *args, **kwargs):
+        """List Loans
+
+        Returns:
+
+            JSON with de list of the loans.
+
+        """
+        loans = Loan.objects.all()
+        loans_serializer = LoanSerializer(loans, many=True)
+        return Response(loans_serializer.data, status=status.HTTP_200_OK)

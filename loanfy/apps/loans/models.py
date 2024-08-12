@@ -2,6 +2,7 @@ import uuid
 
 from apps.choices import LOAN_STATUS_CHOICES, loan_status_dict
 from apps.customers.models import Customer
+from django.core.exceptions import ValidationError
 from django.db import models
 
 
@@ -34,21 +35,20 @@ class Loan(models.Model):
         help_text="Optional field that can contain any value",
     )
     maximum_payment_date = models.DateTimeField()
-    taken_at = models.DateTimeField()
+    taken_at = models.DateTimeField(
+        null=True, blank=True, help_text="Date when the loan is activated"
+    )
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.external_id
+        return str(self.id)
 
-    # def set_outstanding(self):
-    #     amounts = self.objects.filter(customer=self.customer).values_list("amount")
-    #     outstandsing = sum(list(amounts))
-    #     self.outstanding = outstandsing
-    #     self.save()
-
-    # def set_status_paid(self):
-    #     if self.outstanding==0:
-    #         self.status=loan_status_dict["paid"]
-    #     self.save()
+    def set_outstanding(self, value):
+        self.outstanding = float(self.outstanding) - float(value)
+        if self.outstanding < 0:
+            raise ValidationError(
+                "The value of the payment is greater than the outstanding"
+            )
+        return self.save()

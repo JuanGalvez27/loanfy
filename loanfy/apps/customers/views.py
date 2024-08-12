@@ -55,6 +55,35 @@ class CustomerCreateAPIView(APIView):
         return Response(customer_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class CustomerListAPIView(APIView):
+
+    @extend_schema(
+        tags=["Customer"],
+        methods=["GET"],
+        summary="List of Customers",
+        responses={
+            200: OpenApiResponse(
+                response=CustomerSerializer,
+                description="Created",
+            ),
+            # 400: HTTP_response_400,
+            # 401: HTTP_response_401,
+            # 500: HTTP_response_500,
+        },
+    )
+    def get(self, request, *args, **kwargs):
+        """Create Customer
+
+        Returns:
+
+            JSON with the list of customers.
+
+        """
+        customers = Customer.objects.all()
+        customer_serializer = CustomerSerializer(customers, many=True)
+        return Response(customer_serializer.data, status=status.HTTP_200_OK)
+
+
 class CustomerDetailAPIView(APIView):
     # permission_classes = [IsAuthenticated]
     @extend_schema(
@@ -82,6 +111,44 @@ class CustomerDetailAPIView(APIView):
         Returns:
 
             JSON with de data of the customer.
+        """
+        try:
+            customer = Customer.objects.get(external_id=external_id)
+        except Customer.DoesNotExist:
+            return Response(
+                {"message": "No customer found"}, status=status.HTTP_404_NOT_FOUND
+            )
+        customer_serializer = CustomerSerializer(customer)
+        return Response(customer_serializer.data, status=status.HTTP_200_OK)
+
+
+class CustomerBalanceAPIView(APIView):
+    # permission_classes = [IsAuthenticated]
+    @extend_schema(
+        tags=["Customer"],
+        methods=["GET"],
+        summary="Get Customer info",
+        responses={
+            200: OpenApiResponse(
+                response=CustomerSerializer,
+                description="OK",
+            ),
+            # 400: HTTP_response_400,
+            # 401: HTTP_response_401,
+            # 500: HTTP_response_500,
+        },
+    )
+    def get(self, request, external_id):
+        """
+        Customer Balance
+
+        Args:sdfasdfasdasdfsdf
+
+            external_id: Customer external id
+
+        Returns:
+
+            JSON with de data of the balance.
         """
         try:
             customer = Customer.objects.get(external_id=external_id)
