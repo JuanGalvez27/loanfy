@@ -23,6 +23,7 @@ class CustomerSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         rep = super().to_representation(instance)
         return_dict = {
+            "id": rep["id"],
             "external_id": rep["external_id"],
             "status": rep["status"],
             "score": rep["score"],

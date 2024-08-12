@@ -1,12 +1,12 @@
-from apps.customers.views import CustomerCreateAPIView, CustomerDetailAPIView
+from apps.loans.views import LoanCreateAPIView, LoanDetailAPIView, LoanListlAPIView
 from django.urls import path
-from rest_framework.urlpatterns import format_suffix_patterns
 
 urlpatterns = [
-    path("create/", CustomerCreateAPIView.as_view(), name="create_customer"),
+    path("create/", LoanCreateAPIView.as_view(), name="create_loan"),
+    path("list/", LoanListlAPIView.as_view(), name="list_loans"),
     path(
         "detail/<str:external_id>/",
-        CustomerDetailAPIView.as_view(),
-        name="detail_customer",
+        LoanDetailAPIView.as_view(),
+        name="detail_loan",
     ),
 ]
