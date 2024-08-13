@@ -6,6 +6,21 @@ Awesome API to provide information and management of loans.
 
 [Docker](https://docs.docker.com/engine/install/)
 
+### Setting your Envs:
+
+DATABASE_NAME: 
+DATABASE_USER: 
+DATABASE_PASSWORD:
+DATABASE_HOST:
+DATABASE_PORT:
+SECRET_KEY:
+
+POSTGRES_HOST:
+POSTGRES_PORT:
+POSTGRES_DB:
+POSTGRES_USER:
+POSTGRES_PASSWORD:
+
 ## Basic Commands
 
 In order to launch the project locally enter the project repository and execute
