@@ -28,6 +28,3 @@ class Customer(models.Model):
 
     def __str__(self):
         return str(self.id)
-
-    def get_customer_balance(self):
-        pass

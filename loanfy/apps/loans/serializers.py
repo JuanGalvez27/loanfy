@@ -14,7 +14,7 @@ class LoanUpdateSerializer(serializers.Serializer):
 
 
 class LoanSerializer(serializers.ModelSerializer):
-    id = serializers.UUIDField()
+    id = serializers.UUIDField(read_only=True)
     outstanding = serializers.DecimalField(
         max_digits=12, decimal_places=2, read_only=True
     )
