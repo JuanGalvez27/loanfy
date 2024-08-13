@@ -8,18 +8,21 @@ Awesome API to provide information and management of loans.
 
 ### Setting your Envs:
 
+```
 DATABASE_NAME: 
 DATABASE_USER: 
 DATABASE_PASSWORD:
 DATABASE_HOST:
 DATABASE_PORT:
 SECRET_KEY:
-
+```
+```
 POSTGRES_HOST:
 POSTGRES_PORT:
 POSTGRES_DB:
 POSTGRES_USER:
 POSTGRES_PASSWORD:
+```
 
 ## Basic Commands
 
