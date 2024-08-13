@@ -30,3 +30,10 @@ class CustomerSerializer(serializers.ModelSerializer):
             "preapproved_at": rep["created_at"],
         }
         return return_dict
+
+
+class CustomerBalanceSerializer(serializers.Serializer):
+    external_id = serializers.CharField()
+    score = serializers.DecimalField(max_digits=12, decimal_places=2)
+    available_amount = serializers.DecimalField(max_digits=12, decimal_places=2)
+    total_debt = serializers.DecimalField(max_digits=12, decimal_places=2)

@@ -52,3 +52,10 @@ class Loan(models.Model):
                 "The value of the payment is greater than the outstanding"
             )
         return self.save()
+
+    def get_customer_balance(self, customer):
+        loans = self.__class__.objects.filter(customer=customer).values_list(
+            "outstanding", flat=True
+        )
+        total_outstanding = sum(list(loans))
+        return total_outstanding

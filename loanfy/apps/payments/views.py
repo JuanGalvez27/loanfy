@@ -5,6 +5,7 @@ from apps.payments.serializers import (
     PaymentListSerializer,
     PaymentSerializer,
 )
+from apps.responses import HTTP_response_400, HTTP_response_401, HTTP_response_500
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -13,7 +14,7 @@ from rest_framework.views import APIView
 
 
 class PaymentCreateAPIView(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     @extend_schema(
         tags=["Payment"],
@@ -25,9 +26,9 @@ class PaymentCreateAPIView(APIView):
                 response=PaymentSerializer,
                 description="Created",
             ),
-            # 400: HTTP_response_400,
-            # 401: HTTP_response_401,
-            # 500: HTTP_response_500,
+            400: HTTP_response_400,
+            401: HTTP_response_401,
+            500: HTTP_response_500,
         },
     )
     def post(self, request, *args, **kwargs):
@@ -70,7 +71,7 @@ class PaymentCreateAPIView(APIView):
 
 
 class PaymentListAPIView(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     @extend_schema(
         tags=["Payment"],
@@ -89,9 +90,8 @@ class PaymentListAPIView(APIView):
                 response=PaymentListSerializer(many=True),
                 description="OK",
             ),
-            # 400: HTTP_response_400,
-            # 401: HTTP_response_401,
-            # 500: HTTP_response_500,
+            401: HTTP_response_401,
+            500: HTTP_response_500,
         },
     )
     def get(self, request, *args, **kwargs):

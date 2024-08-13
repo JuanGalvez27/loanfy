@@ -1,4 +1,5 @@
 from apps.customers.views import (
+    CustomerBalanceAPIView,
     CustomerCreateAPIView,
     CustomerDetailAPIView,
     CustomerListAPIView,
@@ -13,5 +14,10 @@ urlpatterns = [
         "detail/<str:external_id>/",
         CustomerDetailAPIView.as_view(),
         name="detail_customer",
+    ),
+    path(
+        "balance/<str:external_id>/",
+        CustomerBalanceAPIView.as_view(),
+        name="balance_customer",
     ),
 ]

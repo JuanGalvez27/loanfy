@@ -1,5 +1,16 @@
 from apps.customers.models import Customer
-from apps.customers.serializers import CustomerSerializer, CustomerWriteSerializer
+from apps.customers.serializers import (
+    CustomerBalanceSerializer,
+    CustomerSerializer,
+    CustomerWriteSerializer,
+)
+from apps.loans.models import Loan
+from apps.responses import (
+    HTTP_response_400,
+    HTTP_response_401,
+    HTTP_response_404,
+    HTTP_response_500,
+)
 from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -8,7 +19,7 @@ from rest_framework.views import APIView
 
 
 class CustomerCreateAPIView(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     @extend_schema(
         tags=["Customer"],
@@ -20,9 +31,9 @@ class CustomerCreateAPIView(APIView):
                 response=CustomerSerializer,
                 description="Created",
             ),
-            # 400: HTTP_response_400,
-            # 401: HTTP_response_401,
-            # 500: HTTP_response_500,
+            400: HTTP_response_400,
+            401: HTTP_response_401,
+            500: HTTP_response_500,
         },
     )
     def post(self, request, *args, **kwargs):
@@ -56,6 +67,7 @@ class CustomerCreateAPIView(APIView):
 
 
 class CustomerListAPIView(APIView):
+    permission_classes = [IsAuthenticated]
 
     @extend_schema(
         tags=["Customer"],
@@ -66,9 +78,8 @@ class CustomerListAPIView(APIView):
                 response=CustomerSerializer,
                 description="Created",
             ),
-            # 400: HTTP_response_400,
-            # 401: HTTP_response_401,
-            # 500: HTTP_response_500,
+            401: HTTP_response_401,
+            500: HTTP_response_500,
         },
     )
     def get(self, request, *args, **kwargs):
@@ -85,7 +96,8 @@ class CustomerListAPIView(APIView):
 
 
 class CustomerDetailAPIView(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
+
     @extend_schema(
         tags=["Customer"],
         methods=["GET"],
@@ -95,9 +107,9 @@ class CustomerDetailAPIView(APIView):
                 response=CustomerSerializer,
                 description="OK",
             ),
-            # 400: HTTP_response_400,
-            # 401: HTTP_response_401,
-            # 500: HTTP_response_500,
+            404: HTTP_response_404,
+            401: HTTP_response_401,
+            500: HTTP_response_500,
         },
     )
     def get(self, request, external_id):
@@ -123,26 +135,25 @@ class CustomerDetailAPIView(APIView):
 
 
 class CustomerBalanceAPIView(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
+
     @extend_schema(
         tags=["Customer"],
         methods=["GET"],
-        summary="Get Customer info",
+        summary="Get Customer Balance",
         responses={
             200: OpenApiResponse(
                 response=CustomerSerializer,
                 description="OK",
             ),
-            # 400: HTTP_response_400,
-            # 401: HTTP_response_401,
-            # 500: HTTP_response_500,
+            404: HTTP_response_404,
+            401: HTTP_response_401,
+            500: HTTP_response_500,
         },
     )
     def get(self, request, external_id):
         """
         Customer Balance
-
-        Args:sdfasdfasdasdfsdf
 
             external_id: Customer external id
 
@@ -156,5 +167,13 @@ class CustomerBalanceAPIView(APIView):
             return Response(
                 {"message": "No customer found"}, status=status.HTTP_404_NOT_FOUND
             )
-        customer_serializer = CustomerSerializer(customer)
+        loan = Loan()
+        total_outstanding = loan.get_customer_balance(customer)
+        customer_balance = {
+            "external_id": customer.external_id,
+            "score": customer.score,
+            "total_debt": total_outstanding,
+            "available_amount": (customer.score - total_outstanding),
+        }
+        customer_serializer = CustomerBalanceSerializer(customer_balance)
         return Response(customer_serializer.data, status=status.HTTP_200_OK)
